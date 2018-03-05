@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "ARSlidingPanel"
-  s.version      = "0.1.1"
+  s.version      = "0.1.2"
   s.summary      = "ARSlidingPanel is a realization of sliding-up panel for iOS"
 
   s.description  = <<-DESC
@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.author       = { "Andrii Rogulin" => "andrii.rogulin@gmail.com" }
   s.platform     = :ios, "7.0"
 
-  s.source       = { :git => "https://github.com/andriirogulin/ARSlidingPanel.git", :tag => s.version.to_s }
+  s.source       = { :git => "https://github.com/ambar-septian/ARSlidingPanel.git", :tag => s.version.to_s }
 
   s.source_files = 'Classes/*.{h,m}'
   s.exclude_files = "Classes/Exclude"
