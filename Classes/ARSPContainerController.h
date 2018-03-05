@@ -129,4 +129,8 @@
  */
 - (void)closePanelControllerAnimated:(BOOL)animated animations:(void (^)(void))animations completion:(void (^)(void))completion;
 
+/* Custom function to completely hide panel view */
+-(void)setHiddenPanelView:(BOOL)willHidden;
+
 @end
+

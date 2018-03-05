@@ -21,6 +21,8 @@
 @property (nonatomic, strong) NSLayoutConstraint *panelViewControllerTopConstraint;
 @property (nonatomic, strong) NSLayoutConstraint *panelViewControllerBottomConstraint;
 
+@property (nonatomic) CGFloat tempVisibleZoneHeight;
+
 @end
 
 @implementation ARSPContainerController
@@ -162,7 +164,19 @@
 - (void)setVisibleZoneHeight:(CGFloat)slidingViewControllerVisiblePartHeight
 {
     _visibleZoneHeight = MIN(slidingViewControllerVisiblePartHeight, self.view.frame.size.height);
+    _tempVisibleZoneHeight = _visibleZoneHeight;
     [self updateSlidingViewControllerFrameWithBottomOffset:_panelViewController.view.frame.origin.y];
+}
+
+-(void)setHiddenPanelView:(BOOL)willHidden {
+    if (willHidden) {
+        _tempVisibleZoneHeight = _visibleZoneHeight;
+        _visibleZoneHeight = 1;
+        [self updateSlidingViewControllerFrameWithBottomOffset: 1];
+    } else {
+        _visibleZoneHeight = _tempVisibleZoneHeight;
+        [self updateSlidingViewControllerFrameWithBottomOffset:_visibleZoneHeight];
+    }
 }
 
 - (void)setDropShadow:(BOOL)dropShadow
@@ -326,12 +340,15 @@
                             animationDuration:animationDuration
                                    animations:animations
                                    completion:^{
-                                       self.visibilityState = ARSPVisibilityStateMaximized;
-                                      [self installPanelViewControllerConstraintToTop];
+                                       //                                       if ((UIApplication.sharedApplication.applicationState == UIApplicationStateActive) && (self.viewLoaded &&  self.view.window)) {
+                                       //                                           self.visibilityState = ARSPVisibilityStateMaximized;
+                                       //                                           [self installPanelViewControllerConstraintToTop];
+                                       //
+                                       //                                           if (completion) {
+                                       //                                               completion();
+                                       //                                           }
+                                       //                                       }
                                        
-                                       if (completion) {
-                                           completion();
-                                       }
                                    }];
 }
 
@@ -347,12 +364,15 @@
                             animationDuration:animationDuration
                                    animations:animations
                                    completion:^{
-                                       self.visibilityState = ARSPVisibilityStateMinimized;
-                                       [self installPanelViewControllerConstraintToBottom];
                                        
-                                       if (completion) {
-                                           completion();
-                                       }
+                                       //                                       if ((UIApplication.sharedApplication.applicationState == UIApplicationStateActive)  && (self.viewLoaded &&  self.view.window)){
+                                       //                                           self.visibilityState = ARSPVisibilityStateMinimized;
+                                       //                                           [self installPanelViewControllerConstraintToBottom];
+                                       //
+                                       //                                           if (completion) {
+                                       //                                               completion();
+                                       //                                           }
+                                       //                                       }
                                    }];
 }
 
@@ -384,17 +404,17 @@
           initialSpringVelocity:0.4
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^
-    {
-        if (animations) {
-            animations();
-        }
-        [self updateSlidingViewControllerFrameWithBottomOffset:bottomOffset];
-    }
+     {
+         if (animations) {
+             animations();
+         }
+         [self updateSlidingViewControllerFrameWithBottomOffset:bottomOffset];
+     }
                      completion:^(BOOL finished) {
-        if (completion) {
-            completion();
-        }
-    }];
+                         if (completion) {
+                             completion();
+                         }
+                     }];
 }
 
 #pragma mark - Handle pan gesture
@@ -495,3 +515,4 @@
 }
 
 @end
+
