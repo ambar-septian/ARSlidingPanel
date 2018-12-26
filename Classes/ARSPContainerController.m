@@ -237,6 +237,7 @@
     }
 }
 
+
 #pragma mark - Under the hood
 
 - (void)updateSlidingViewControllerFrameWithBottomOffset:(CGFloat)bottomOffset
@@ -291,6 +292,7 @@
                                                                         multiplier:1
                                                                           constant:self.maxPanelHeight ? self.view.frame.size.height - self.maxPanelHeight : 0];
     [self.view addConstraint:self.panelViewControllerTopConstraint];
+    [self.view layoutIfNeeded];
 }
 
 - (void)installPanelViewControllerConstraintToBottom
@@ -304,6 +306,7 @@
                                                                         multiplier:1
                                                                           constant: - self.visibleZoneHeight];
     [self.view addConstraint:self.panelViewControllerTopConstraint];
+    [self.view layoutIfNeeded];
 }
 
 #pragma mark - Fabric method for creating contoller
@@ -318,17 +321,31 @@
 
 - (void)maximizePanelControllerAnimated:(BOOL)animated completion:(void (^)(void))completion
 {
-    [self maximizePanelControllerAnimated:animated animations:nil completion:completion];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self maximizePanelControllerAnimated:animated animations:nil completion:completion];
+    });
+    
 }
 
 - (void)minimizePanelControllerAnimated:(BOOL)animated completion:(void (^)(void))completion
 {
-    [self minimizePanelControllerAnimated:animated animations:nil completion:completion];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self minimizePanelControllerAnimated:animated animations:nil completion:completion];
+    });
 }
 
 - (void)closePanelControllerAnimated:(BOOL)animated completion:(void (^)(void))completion
 {
-    [self closePanelControllerAnimated:animated animations:nil completion:completion];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self closePanelControllerAnimated:animated animations:nil completion:completion];
+    });
+}
+
+- (void)initiatePanelControllerAnimated:(BOOL)animated completion:(void (^)(void))completion
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self initiatePanelControllerAnimated:animated animations:nil completion:completion];
+    });
 }
 
 - (void)maximizePanelControllerAnimated:(BOOL)animated animations:(void (^)(void))animations completion:(void (^)(void))completion
@@ -340,15 +357,13 @@
                             animationDuration:animationDuration
                                    animations:animations
                                    completion:^{
-                                       //                                       if ((UIApplication.sharedApplication.applicationState == UIApplicationStateActive) && (self.viewLoaded &&  self.view.window)) {
-                                       //                                           self.visibilityState = ARSPVisibilityStateMaximized;
-                                       //                                           [self installPanelViewControllerConstraintToTop];
+                                       self.visibilityState = ARSPVisibilityStateMaximized;
+                                       //                                      [self installPanelViewControllerConstraintToTop];
                                        //
-                                       //                                           if (completion) {
-                                       //                                               completion();
-                                       //                                           }
-                                       //                                       }
-                                       
+                                       [self.view layoutIfNeeded];
+                                       if (completion) {
+                                           completion();
+                                       }
                                    }];
 }
 
@@ -357,6 +372,7 @@
     CGFloat bottomOffset = (self.panelViewControllerTopConstraint.constant == 0 || self.panelViewControllerTopConstraint.constant == self.view.frame.size.height - self.maxPanelHeight)
     ? self.visibleZoneHeight - self.panelViewController.view.frame.size.height
     : self.visibleZoneHeight;
+    
     self.visibilityState = ARSPVisibilityStateIsMinimizing;
     CGFloat animationDuration = (self.animationDuration ? : 0.3f);
     [self movePanelControllerWithBottomOffset:bottomOffset
@@ -364,15 +380,33 @@
                             animationDuration:animationDuration
                                    animations:animations
                                    completion:^{
-                                       
-                                       //                                       if ((UIApplication.sharedApplication.applicationState == UIApplicationStateActive)  && (self.viewLoaded &&  self.view.window)){
-                                       //                                           self.visibilityState = ARSPVisibilityStateMinimized;
-                                       //                                           [self installPanelViewControllerConstraintToBottom];
+                                       self.visibilityState = ARSPVisibilityStateMinimized;
+                                       //                                       [self installPanelViewControllerConstraintToBottom];
                                        //
-                                       //                                           if (completion) {
-                                       //                                               completion();
-                                       //                                           }
-                                       //                                       }
+                                       [self.view layoutIfNeeded];
+                                       if (completion) {
+                                           completion();
+                                       }
+                                   }];
+}
+
+- (void)initiatePanelControllerAnimated:(BOOL)animated animations:(void (^)(void))animations completion:(void (^)(void))completion
+{
+    CGFloat bottomOffset = self.visibleZoneHeight;
+    self.visibilityState = ARSPVisibilityStateIsMinimizing;
+    CGFloat animationDuration = (self.animationDuration ? : 0.3f);
+    [self movePanelControllerWithBottomOffset:bottomOffset
+                                     animated:animated
+                            animationDuration:animationDuration
+                                   animations:animations
+                                   completion:^{
+                                       self.visibilityState = ARSPVisibilityStateMinimized;
+                                       //                                      [self installPanelViewControllerConstraintToBottom];
+                                       //
+                                       [self.view layoutIfNeeded];
+                                       if (completion) {
+                                           completion();
+                                       }
                                    }];
 }
 
@@ -515,4 +549,3 @@
 }
 
 @end
-
